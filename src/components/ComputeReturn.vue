@@ -39,7 +39,6 @@
 
                         <button type="button" class="btn btn-primary" v-on:click="computeReturn">Compute Return</button>
 
-
                         <div class="alert alert-success my-2" v-if="purchaseRecord.returnAmount" role="alert">Your return amount is {{}}</div>
 
                     </form>
@@ -105,6 +104,9 @@
             getMutualFundHousesList() {
                 this.$http.get("http://localhost:3000/mutualFundHouses").then((response) => {
                     this.mfHouseOptions = response.data;
+                })
+                .catch((error) => {
+                    alert(error.message);
                 });
             },
             onFundHouseSelected() {
@@ -117,6 +119,9 @@
                     }
                 }).then((response) => {
                     this.mfOptions = response.data;
+                })
+                .catch((error) => {
+                    alert(error.message);
                 });
             },
             computeReturn() {
@@ -124,6 +129,9 @@
                     this.purchaseRecord.returnAmount = response.data.returnAmount;
                     this.purchaseRecords.push(this.purchaseRecord);
                     this.clearPurchaseRecordForm();
+                })
+                .catch((error) => {
+                    alert(error.message);
                 });
             },
             clearPurchaseRecordForm() {
