@@ -6,6 +6,7 @@ import VueAxios from 'vue-axios'
 import urls from './urls.js'
 
 Vue.use(VueAxios, axios)
+Vue.prototype.$urls = urls;
 
 Vue.config.productionTip = false
 

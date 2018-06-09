@@ -6,7 +6,7 @@
         </div>
 
         <div class="row d-flex justify-content-around">
-            <div class="col-sm-6 card bg-light">
+            <div class="col-sm-5 card bg-light">
                 <div class="card-body">
                     <form>
                         <div class="form-group">
@@ -16,58 +16,85 @@
 
                         <div class="form-group">
                             <label for="investmentDate">Investment Date</label>
-                            <input type="date" class="form-control" v-model="purchaseRecord.date" id="investmentDate" placeholder="Enter the date you invested on.">
+                            <datepicker name="uniquename" v-model="purchaseRecord.date" id="investmentDate"></datepicker>
                         </div>
 
                         <div class="form-group">
                             <label for="fundHouseSelect">Select a fund house</label>
-                            <select class="form-control" v-model="purchaseRecord.selectedFundHouse" id="fundHouseSelect">
-                                <option v-for="option in options" v-bind:value="option.value">
-                                    {{ option.text }}
+                            <select class="form-control" v-model="purchaseRecord.selectedFundHouse" v-on:change="onFundHouseSelected" id="fundHouseSelect">
+                                <option v-for="option in mfHouseOptions" v-bind:value="option">
+                                    {{ option }}
                                 </option>
                             </select>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" v-if="purchaseRecord.selectedFundHouse">
                             <label for="fundSelect">Select a fund</label>
                             <select class="form-control" v-model="purchaseRecord.selectedFund" id="fundSelect">
-                                <option v-for="option in options" v-bind:value="option.value">
-                                    {{ option.text }}
+                                <option v-for="option in mfOptions" v-bind:value="option">
+                                    {{ option }}
                                 </option>
                             </select>
                         </div>
 
-                        <button type="button" class="btn btn-primary">Compute Return</button>
+                        <button type="button" class="btn btn-primary" v-on:click="computeReturn">Compute Return</button>
+
+
+                        <div class="alert alert-success my-2" v-if="purchaseRecord.returnAmount" role="alert">Your return amount is {{}}</div>
 
                     </form>
                 </div>
             </div>
 
-            <div class="col-sm-3 card bg-light">
+            <div class="col-sm-6 card bg-light">
                 <div class="card-body">
                     Your Purchase Records
-                    <button type="button" class="btn btn-primary">Add a new record</button>
+                    <table class="table table-striped my-2">
+                        <thead>
+                            <tr>
+                                <th scope="col">Investment Date</th>
+                                <th scope="col">Amount Invested</th>
+                                <th scope="col">Return Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="purchase in purchaseRecords">
+                                <td>{{purchase.date}}</td>
+                                <td>{{purchase.amount}}</td>
+                                <td>{{purchase.returnAmount}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </div>
+
     </div>
 </template>
 
 <script>
+    import Datepicker from 'vuejs-datepicker';
     export default {
+        components: {
+            Datepicker
+        },
         data: function () {
             return {
-                purchaseRecord : {
+                purchaseRecord: {
                     date: undefined,
                     amount: undefined,
                     selectedFundHouse: '',
                     selectedFund: '',
+                    returnAmount: ''
                 },
-                options: [
-                    { text: 'One', value: 'A' },
-                    { text: 'Two', value: 'B' },
-                    { text: 'Three', value: 'C' }
+                purchaseRecords: [
+
+                ],
+                mfHouseOptions: [
+                ],
+                mfOptions: [
+
                 ]
             }
         },
@@ -76,19 +103,37 @@
         },
         methods: {
             getMutualFundHousesList() {
-                this.$http.get(api).then((response) => {
-                    console.log(response.data)
+                this.$http.get("http://localhost:3000/mutualFundHouses").then((response) => {
+                    this.mfHouseOptions = response.data;
                 });
             },
-            getMutualFundsList(){
-                this.$http.get(api).then((response) => {
-                    console.log(response.data)
+            onFundHouseSelected() {
+                this.getMutualFundsList();
+            },
+            getMutualFundsList() {
+                this.$http.get("http://localhost:3000/mutualFunds", {
+                    params: {
+                        selectedFundHouse: this.purchaseRecord.selectedFundHouse
+                    }
+                }).then((response) => {
+                    this.mfOptions = response.data;
                 });
             },
             computeReturn() {
-                this.$http.post(api).then((response) => {
-                    console.log(response.data)
+                this.$http.post("http://localhost:3000/computeReturn", this.purchaseRecord).then((response) => {
+                    this.purchaseRecord.returnAmount = response.data.returnAmount;
+                    this.purchaseRecords.push(this.purchaseRecord);
+                    this.clearPurchaseRecordForm();
                 });
+            },
+            clearPurchaseRecordForm() {
+                this.purchaseRecord = {
+                    date: undefined,
+                    amount: undefined,
+                    selectedFundHouse: '',
+                    selectedFund: '',
+                    returnAmount: ''
+                };
             }
         }
     }
