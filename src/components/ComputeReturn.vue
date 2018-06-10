@@ -6,7 +6,7 @@
         </div>
 
         <div class="row d-flex justify-content-around">
-            <div class="col-sm-5 card bg-light">
+            <div class="col-sm-4 card bg-light">
                 <div class="card-body">
                     <form>
                         <div class="form-group">
@@ -45,20 +45,22 @@
                 </div>
             </div>
 
-            <div class="col-sm-6 card bg-light">
+            <div class="col-sm-7 card bg-light">
                 <div class="card-body">
                     Your Purchase Records
-                    <table class="table table-striped my-2">
+                    <table class="table table-sm table-striped my-2">
                         <thead>
                             <tr>
-                                <th scope="col">Investment Date</th>
+                                <th scope="col">Fund House</th>
+                                <th scope="col text-truncate">Mutual Fund</th>
                                 <th scope="col">Amount Invested</th>
                                 <th scope="col">Return Amount</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="purchase in purchaseRecords">
-                                <td>{{purchase.date}}</td>
+                                <td>{{purchase.selectedFundHouse}}</td>
+                                <td>{{purchase.selectedFund}}</td>
                                 <td>{{purchase.amount}}</td>
                                 <td>{{purchase.returnAmount}}</td>
                             </tr>
