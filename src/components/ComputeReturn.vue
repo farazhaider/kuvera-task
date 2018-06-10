@@ -101,10 +101,11 @@
         },
         mounted: function () {
             this.getMutualFundHousesList();
+            console.log(this.$urls);
         },
         methods: {
             getMutualFundHousesList() {
-                this.$http.get("http://localhost:3000/mutualFundHouses").then((response) => {
+                this.$http.get(this.$urls.BASE_URL+this.$urls.GET_MUTUAL_FUND_HOUSES).then((response) => {
                     this.mfHouseOptions = response.data;
                 })
                 .catch((error) => {
@@ -115,7 +116,7 @@
                 this.getMutualFundsList();
             },
             getMutualFundsList() {
-                this.$http.get("http://localhost:3000/mutualFunds", {
+                this.$http.get(this.$urls.BASE_URL+this.$urls.GET_MUTUAL_FUNDS, {
                     params: {
                         selectedFundHouse: this.purchaseRecord.selectedFundHouse
                     }
@@ -127,7 +128,7 @@
                 });
             },
             computeReturn() {
-                this.$http.post("http://localhost:3000/computeReturn", this.purchaseRecord).then((response) => {
+                this.$http.post(this.$urls.BASE_URL+this.$urls.COMPUTE_RETURN_VALUE, this.purchaseRecord).then((response) => {
                     this.purchaseRecord.returnAmount = response.data.returnAmount;
                     this.purchaseRecords.push(this.purchaseRecord);
                     this.clearPurchaseRecordForm();
