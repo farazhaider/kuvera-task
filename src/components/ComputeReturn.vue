@@ -37,9 +37,8 @@
                             </select>
                         </div>
 
-                        <button type="button" class="btn btn-primary" v-on:click="computeReturn">Compute Return</button>
+                        <button type="button" class="btn btn-primary" :disabled="!showComputeReturn" v-on:click="computeReturn">Compute Return</button>
 
-                        <div class="alert alert-success my-2" v-if="purchaseRecord.returnAmount" role="alert">Your return amount is {{}}</div>
 
                     </form>
                 </div>
@@ -75,79 +74,97 @@
 </template>
 
 <script>
-    import Datepicker from 'vuejs-datepicker';
-    export default {
-        components: {
-            Datepicker
-        },
-        data: function () {
-            return {
-                purchaseRecord: {
-                    date: undefined,
-                    amount: undefined,
-                    selectedFundHouse: '',
-                    selectedFund: '',
-                    returnAmount: ''
-                },
-                purchaseRecords: [
-
-                ],
-                mfHouseOptions: [
-                ],
-                mfOptions: [
-
-                ]
-            }
-        },
-        mounted: function () {
-            this.getMutualFundHousesList();
-            console.log(this.$urls);
-        },
-        methods: {
-            getMutualFundHousesList() {
-                this.$http.get(this.$urls.BASE_URL+this.$urls.GET_MUTUAL_FUND_HOUSES).then((response) => {
-                    this.mfHouseOptions = response.data;
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-            },
-            onFundHouseSelected() {
-                this.getMutualFundsList();
-            },
-            getMutualFundsList() {
-                this.$http.get(this.$urls.BASE_URL+this.$urls.GET_MUTUAL_FUNDS, {
-                    params: {
-                        selectedFundHouse: this.purchaseRecord.selectedFundHouse
-                    }
-                }).then((response) => {
-                    this.mfOptions = response.data;
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-            },
-            computeReturn() {
-                this.$http.post(this.$urls.BASE_URL+this.$urls.COMPUTE_RETURN_VALUE, this.purchaseRecord).then((response) => {
-                    this.purchaseRecord.returnAmount = response.data.returnAmount;
-                    this.purchaseRecords.push(this.purchaseRecord);
-                    this.clearPurchaseRecordForm();
-                })
-                .catch((error) => {
-                    alert(error.message);
-                });
-            },
-            clearPurchaseRecordForm() {
-                this.purchaseRecord = {
-                    date: undefined,
-                    amount: undefined,
-                    selectedFundHouse: '',
-                    selectedFund: '',
-                    returnAmount: ''
-                };
-            }
-        }
+import Datepicker from "vuejs-datepicker";
+export default {
+  components: {
+    Datepicker
+  },
+  data: function() {
+    return {
+      purchaseRecord: {
+        date: undefined,
+        amount: undefined,
+        selectedFundHouse: "",
+        selectedFund: "",
+        returnAmount: ""
+      },
+      purchaseRecords: [],
+      mfHouseOptions: [],
+      mfOptions: []
+    };
+  },
+  mounted: function() {
+    this.getMutualFundHousesList();
+    console.log(this.$urls);
+  },
+  methods: {
+    getMutualFundHousesList() {
+      this.$http
+        .get(this.$urls.BASE_URL + this.$urls.GET_MUTUAL_FUND_HOUSES)
+        .then(response => {
+          this.mfHouseOptions = response.data;
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    },
+    onFundHouseSelected() {
+      this.getMutualFundsList();
+    },
+    getMutualFundsList() {
+      this.$http
+        .get(this.$urls.BASE_URL + this.$urls.GET_MUTUAL_FUNDS, {
+          params: {
+            selectedFundHouse: this.purchaseRecord.selectedFundHouse
+          }
+        })
+        .then(response => {
+          this.mfOptions = response.data;
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    },
+    computeReturn() {
+      this.$http
+        .post(
+          this.$urls.BASE_URL + this.$urls.COMPUTE_RETURN_VALUE,
+          this.purchaseRecord
+        )
+        .then(response => {
+          this.purchaseRecord.returnAmount = response.data.returnAmount;
+          this.purchaseRecords.push(this.purchaseRecord);
+          this.clearPurchaseRecordForm();
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    },
+    clearPurchaseRecordForm() {
+      this.purchaseRecord = {
+        date: undefined,
+        amount: undefined,
+        selectedFundHouse: "",
+        selectedFund: "",
+        returnAmount: ""
+      };
     }
+  },
+  computed: {
+    showComputeReturn: function() {
+      if (
+        this.purchaseRecord.date != undefined &&
+        this.purchaseRecord.amount != undefined &&
+        this.purchaseRecord.selectedFundHouse != "" &&
+        this.purchaseRecord.selectedFund != ""
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+};
 </script>
 
 <style>
